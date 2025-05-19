@@ -23,17 +23,16 @@ checkstyle-config/
 
 2. Paste the contents of `checkstyle-workflow.yml` from this repo.
 
-3. In your repo’s GitHub **Settings → Variables**, add:
+3. In your repo’s GitHub **Settings → Variables**, add: 
 
 ```
 Name: ENABLE_GHA_CHECKSTYLE
 Value: true
 ```
-
-4. The workflow will:
-   - Clone this repo from `https://github.com/bhoopesh-kroger/checkstyle-config`
-   - Copy `run_checkstyle_codebase.sh`, `run_checkstyle_for_PR` and `custom_checks.xml` to your project
-   - Run Checkstyle on PRs and whole codebase
+4. Copy *.sh files and custom_checks.xml from this repo to your repository.
+   
+5. The workflow will:
+   - Run Checkstyle on PRs and whole codebase whenever a PR is open.
    - Upload `.txt` into the artifacts with a summary
 
 ---
