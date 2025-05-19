@@ -1,0 +1,66 @@
+name: Checkstyle Code Quality
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  checkstyle:
+    if: vars.ENABLE_GHA_CHECKSTYLE == 'true'
+    runs-on: ubuntu-latest
+    name: Run Checkstyle
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch checkstyle-config from central repo
+        run: |
+          git clone --depth 1 https://github.com/bhoopesh-kroger/checkstyle-config temp-checkstyle
+          cp temp-checkstyle/run_checkstyle_codebase.sh .
+          cp temp-checkstyle/run_checkstyle_for_PR.sh .
+          cp temp-checkstyle/custom_checks.xml .
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Debug - List files in root directory
+        run: |
+          echo "Listing root directory contents:"
+          ls -la
+
+      - name: Run Checkstyle Script for Codebase
+        run: |
+          if [ -f ./run_checkstyle_codebase.sh ]; then
+            echo "run_checkstyle file found"
+            chmod +x ./run_checkstyle_codebase.sh
+            bash ./run_checkstyle_codebase.sh
+          else
+            echo "Checkstyle script to run for whole codebase not found."
+            exit 1
+          fi
+
+
+      - name: Run Checkstyle Script for PR
+        run: |
+          if [ -f ./run_checkstyle_for_PR.sh ]; then
+            echo "run_checkstyle file found"
+            chmod +x ./run_checkstyle_for_PR.sh
+            bash ./run_checkstyle_for_PR.sh
+          else
+            echo "Checkstyle script to run for PR not found."
+            exit 1
+          fi
+
+
+      - name: Upload Checkstyle Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle-reports
+          path: |
+            checkstyle-reports/*.txt
